@@ -60,7 +60,7 @@ app.post('/personagens', async (req, res) => {
     }
 });
 
-app.put('personagens/:id', async (req, res) => {
+app.put('/personagens/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { name, poder, nivel, hp } = req.body;
@@ -70,7 +70,7 @@ app.put('personagens/:id', async (req, res) => {
         console.error('Erro ao atualizar personagem:', error.message);
         res.status(500).send({ message: 'Erro ao atualizar personagem' });
     }
-});    
+});
 
 app.delete('/personagens/:id', async (req, res) => {
     try {
