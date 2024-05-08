@@ -24,8 +24,6 @@ app.get('/', (req, res) => {
 });
 
 
-//CRUD PERSONAGENS
-
 //BUSCAR TODOS OS PERSONAGENS (READ)
 app.get('/personagens', async (req, res) => {
     try {
@@ -127,7 +125,6 @@ app.get('/personagens/nivel/:nivel', async (req, res) => {
     }
 });
 
-
 //REALIZAR BATALHA ENTRE DOIS PERSONAGENS
 app.get('/batalhas/:id_personagem1/:id_personagem2', async (req, res) => {
     const { id_personagem1, id_personagem2 } = req.params;
@@ -166,6 +163,7 @@ async function calculateWinner(id_personagem1, id_personagem2) {
     }
 }
 
+//LISTAR TODAS AS BATALHAS
 app.get('/batalhas', async (req, res) => {
     try {
         const { rows } = await pool.query('SELECT * FROM batalhas');
