@@ -166,10 +166,11 @@ async function calculateWinner(id_personagem1, id_personagem2) {
 //LISTAR TODAS AS BATALHAS
 app.get('/batalhas', async (req, res) => {
     try {
-        const { rows } = await pool.query('SELECT * FROM batalhas');
+        const {rows} = await pool.query('SELECT batalhas.id, id_personagem1, id_personagem2, id_vencedor, personagens.name as vencedor_name, personagens.poder as vencedor_poder, personagens.nivel as vencedor_nivel, personagens.hp as vencedor_hp FROM batalhas INNER JOIN personagens ON batalhas.id_vencedor = personagens.id'); 
         res.json(rows);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
+
 
