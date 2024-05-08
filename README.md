@@ -18,7 +18,7 @@ UPDATE -  Atualizar os personagens
 <br>
 DELETE -  Deletar os personagens
 
-### Tecnologias Utilizadas
+### TECNOLOGIAS UTILIZADAS
 Node.js
 <br>
 Express.js
