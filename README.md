@@ -10,13 +10,13 @@ Certifique-se de ter o Node.js e o PostgreSQL instalados em seu sistema antes de
 ### FUNCIONALIDADES
 CRUD DOS PERSONAGENS
 
-CREATE - Criação de personagens
+CREATE -  Criação de personagens
 <br>
-READ - Leitura dos dados dos personagens
+READ   -  Leitura dos dados dos personagens
 <br>
-UPDATE - Atualizar os personagens
+UPDATE -  Atualizar os personagens
 <br>
-DELETE - Deletar os personagens
+DELETE -  Deletar os personagens
 
 ### Tecnologias Utilizadas
 Node.js
@@ -28,16 +28,8 @@ PostgreSQL
 
 ### COMO USAR
 1. Clone o repositório para o seu ambiente local.
-<br>
-
 2. Instale as dependências do projeto usando npm install.
-<br>
-
 3. Configure o banco de dados PostgreSQL com o nome heroes_db e execute o script script.sql para criar as tabelas necessárias.
-<br>
-
 4. Abra o arquivo index.js e ajuste as configurações do banco de dados conforme necessário (usuário, senha, host, porta).
-<br>
-
 5. Inicie o servidor executando npm run dev.
 Acesse as diferentes rotas disponíveis conforme a documentação fornecida.
