@@ -10,13 +10,14 @@ CREATE TABLE personagens(
 
 CREATE TABLE batalhas(
     id SERIAL PRIMARY KEY,
-    id_persoanegm1 INT,
+    id_personagem1 INT,
     id_personagem2 INT,
     id_vencedor INT,
-    FOREIGN KEY (id_persoanegm1) REFERENCES personagens(id),
+    FOREIGN KEY (id_personagem1) REFERENCES personagens(id),
     FOREIGN KEY (id_personagem2) REFERENCES personagens(id),
     FOREIGN KEY (id_vencedor) REFERENCES personagens(id)
 );
+
 
 
 INSERT INTO personagens (name, poder, nivel, hp) VALUES ('Naruto Uzumaki', 'Clones Das Sombra', 10, 100);

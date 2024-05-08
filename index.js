@@ -89,51 +89,83 @@ app.delete('/personagens/:id', async (req, res) => {
     }
 });
 
-//ROTA PARA REALIZAR UMA BATALHA ENTRE OS PERSONAGENS
-app.get('/batalhas/:personagem1/:personagem2', async (req, res) => {
-    const { personagem1, personagem2 } = req.params;
-
+// OBTER UM PERSONAGEM ESPECIFICO
+app.get('/personagens/:id', async (req, res) => {
+    const { id } = req.params;
     try {
-        //CALCULAR O VENCEDOR
-        const vencedorId = await calcularVecendor(personagem1, personagem2);
+        const { rows } = await pool.query('SELECT * FROM personagens WHERE id = $1', [id]); // Corrigido o erro de sintaxe
+        if (!rows || rows.length === 0) { // Corrigido o tratamento de caso em que nenhum resultado é retornado
+            res.status(404).json({ message: 'Personagem não encontrado!' });
+        } else {
+            res.json(rows[0]);
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
-        //INSERE O REGISTRO DA BATALHA NA TABELA BATALHAS
-        await pool.query('INSERT INTO batalhas (personagem1, personagem2, vencedor) VALUES ($1, $2, $3)', [personagem1, personagem2, vencedorId]);
+// OBTER PERSONAGENS POR PODER
+app.get('/personagens/poder/:poder', async (req, res) => {
+    const { poder } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM personagens WHERE poder = $1', [poder]);
+        const rows = result.rows; // Extrair apenas as linhas dos resultados
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
-        //EXIBE O VENCEDOR E A MENSAGEM DE SUCESSO
-        const { rows } = await pool.query('SELECT * FROM personagens WHERE id = $1', [vencedorId]);
-        res.json({ vencedor: rows[0], message: 'Batalha realizada com sucesso!' });
+// OBTER PERSONAGENS POR NIVEL
+app.get('/personagens/nivel/:nivel', async (req, res) => {
+    const { nivel } = req.params;
+    try {
+        const { rows } = await pool.query('SELECT * FROM personagens WHERE nivel = $1', [nivel]);
+        res.json(rows);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
 
-//FUNÇÃO PARA CALCULAR O VENCEDOR DA BATALHA
+//REALIZAR BATALHA ENTRE DOIS PERSONAGENS
+app.get('/batalhas/:id_personagem1/:id_personagem2', async (req, res) => {
+    const { id_personagem1, id_personagem2 } = req.params;
+    try {
+        //LÓGICA PARA CALCULAR O VENCEDOR
+        const vencedorId = await calculateWinner(id_personagem1, id_personagem2);
+        //INSERE O REGISTRO NA TABELA DE BATALHAS
+        await pool.query('INSERT INTO batalhas(id_personagem1, id_personagem2, id_vencedor) VALUES($1, $2, $3)', [id_personagem1, id_personagem2, vencedorId]);
+        //EXIBE O VENCEDOR E AS MENSAGENS DE SUCESSO
+        const { rows } = await pool.query('SELECT * FROM personagens WHERE id = $1', [vencedorId]);
+        res.json({ message: 'Batalha realizada com sucesso!' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
-async function calcularVecendor(personagem1, personagem2) {
+async function calculateWinner(id_personagem1, id_personagem2) {
     //LÓGICA PARA CALCULAR O VENCEDOR
-    const personagem1 = await pool.query('SELECT * FROM personagens WHERE id = $1', [personagem1]);
-    const personagem2 = await pool.query('SELECT * FROM personagens WHERE id = $1', [personagem2]);
-    //MAIOR NIVEL VENCE
+    const personagem1 = await pool.query('SELECT * FROM personagens WHERE id = $1', [id_personagem1]);
+    const personagem2 = await pool.query('SELECT * FROM personagens WHERE id = $1', [id_personagem2]);
+    //MAIOR NÍVEL VENCE
     if (personagem1.rows[0].nivel > personagem2.rows[0].nivel) {
-        return personagem1;
+        return id_personagem1;
     } else if (personagem1.rows[0].nivel < personagem2.rows[0].nivel) {
-        return personagem2;
+        return id_personagem2;
     } else {
-        //SE O NIVEL FOR IGUAL, O MAIOR HP VENCE
+        //EM CASO DE EMPATE, MAIOR HP VENCE
         if (personagem1.rows[0].hp > personagem2.rows[0].hp) {
-            return personagem1;
+            return id_personagem1;
         } else if (personagem1.rows[0].hp < personagem2.rows[0].hp) {
-            return personagem2;
+            return id_personagem2;
         } else {
-            //SE O HP FOR IGUAL, O PRIEMIRO PERSONAGEM VENCE
-            return personagem1;
+            //EM CASO DE EMPATE, RETORNA O PRIMEIRO PERSONAGEM
+            return id_personagem1;
         }
     }
 }
 
-//ROTA PARA BUSCAR TODAS AS BATALHAS
 app.get('/batalhas', async (req, res) => {
     try {
         const { rows } = await pool.query('SELECT * FROM batalhas');
@@ -143,12 +175,3 @@ app.get('/batalhas', async (req, res) => {
     }
 });
 
-//ROTA PARA BUSCAR O HISTORICO DE BATALHAS COM OS DADOS DOS PERSONAGENS
-app.get('/batalhas/personagens', async (req, res) => {
-    try {
-        const { rows } = await pool.query('SELECT batalhas.id, personagem1, personagem2, vencedor, personagens.name as vencedor_name, personagens.poder as vencedor_poder, personagens.nivel as vencedor_nivel, personagens.hp as vencedor_hp FROM batalhas INNER JOIN personagens ON batalhas.vencedor = personagens.id');
-        res.json(rows);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
